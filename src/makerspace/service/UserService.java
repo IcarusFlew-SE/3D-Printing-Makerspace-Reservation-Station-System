@@ -6,6 +6,8 @@ import java.util.*;
 public class UserService {
     private Map<String, User> users;
     private DbService dbService;
+    private static final int ID_LENGTH = 6;
+    private static final Random random = new Random();
     
     public UserService() {
         this.users = new HashMap<>();
@@ -70,8 +72,8 @@ public class UserService {
     public List<Client> getAllClients() 
     {
         return users.values().stream()
-                   .filter(user -> user instanceof Client)
-                   .map(user -> (Client) user)
+                   .filter(Client.class::isInstance)
+                   .map(Client.class::cast)
                    .collect(java.util.stream.Collectors.toList());
     }
     
@@ -108,6 +110,17 @@ public class UserService {
 		dbService.updateUser(user);
 	}
     
+    public void updateUserBalance(String userId, double amount) throws UserException, InvalidReservationException {
+		User user = getUserById(userId);
+		if (!(user instanceof Client)) {
+			throw new UserException("Only Clients Have Account Balances");
+		} else {
+		Client client = (Client) user;
+		client.updateAccountBalance(amount);
+		dbService.updateUser(client);
+		}
+	}
+    
     public void updateUserPassword(String userId, String newPassword) throws UserException, InvalidReservationException {
     	User user = getUserById(userId);
     	if (newPassword == null || newPassword.length() < 6) {
@@ -123,8 +136,13 @@ public class UserService {
 		dbService.deleteUser(userId);
 	}
     
-    private String generateUserId() {
-        return "USER_" + System.currentTimeMillis();
+    private static String generateUserId() {
+    	StringBuilder sb = new StringBuilder(ID_LENGTH);
+    	for (int i = 0; i < ID_LENGTH; i++) {
+    		int digit = random.nextInt(10);
+    		sb.append(digit);
+    	}
+        return "USER_" + sb.toString();
     }
     
     private void loadUsersFromDatabase() {

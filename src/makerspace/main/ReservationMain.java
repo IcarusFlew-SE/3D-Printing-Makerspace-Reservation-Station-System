@@ -92,7 +92,7 @@ public class ReservationMain {
         System.out.println("2. Make Reservation");
         System.out.println("3. View My Reservations");
         System.out.println("4. Cancel Reservation");
-        System.out.println("5. Add Funds to Account");
+        System.out.println("5. Add Money to Account");
         System.out.println("6. View 3D Printers");
         System.out.println("7. Logout");
         System.out.print("Choose option: ");
@@ -205,8 +205,8 @@ public class ReservationMain {
         String email = scanner.nextLine();
         System.out.print("Password: ");
         String password = scanner.nextLine();
-        System.out.print("Admin Level (Top Admin/Manager/Assistant): ");
-        String adminLevel = scanner.nextLine();
+        System.out.print("Admin Level (TOP/MANAGER/BASIC): ");
+        String adminLevel = scanner.nextLine().toUpperCase().trim().replaceAll("\\s+", "_");
         
         try {
             String userId = userService.registerAdmin(username, email, password, adminLevel);
@@ -354,16 +354,22 @@ public class ReservationMain {
         System.out.println("\n=== Add Funds ===");
         System.out.print("Enter amount to add: $");
         double amount = getDoubleInput();
-        
         if (amount <= 0) {
             System.out.println("Invalid amount.");
             return;
         }
-        
-        Client client = (Client) currentUser;
-        client.updateAccountBalance(amount);
-        System.out.printf("$%.2f added to your account. New balance: $%.2f\n", 
-                         amount, client.getAccountBalance());
+        try {
+            Client client = (Client) currentUser;
+            client.updateAccountBalance(amount);
+            
+            userService.updateUserEmail(client.getUserId(), client.getEmail()); // Save updated balance
+            
+            System.out.printf("$%.2f added to your account. New balance: $%.2f\n", 
+                             amount, 
+                             client.getAccountBalance());
+        } catch (Exception e) {
+            System.out.println("Error updating balance: " + e.getMessage());
+        }
     }
     
     // Admin Functions
@@ -407,7 +413,7 @@ public class ReservationMain {
             equipmentService.setEquipmentStatus(equipmentId, status);
             System.out.println("Equipment status updated successfully!");
         } catch (EquipmentUnavailableException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Update Error: " + e.getMessage());
         }
     }
     
@@ -438,8 +444,11 @@ public class ReservationMain {
         System.out.println("\n1. Change User Email");
         System.out.println("2. Change User Password");
         System.out.println("3. Delete User");
+        System.out.println("0. Back to Main Menu");
         System.out.print("Choose action: ");
         int choice = getIntInput();
+        
+        if (choice == 0) return;
         
         System.out.print("Enter User ID: ");
         String userId = scanner.nextLine();
@@ -495,7 +504,7 @@ public class ReservationMain {
             if (choice == 1) {
                 System.out.print("Print Technology (FDM/SLA/SLS): ");
                 String tech = scanner.nextLine();
-                System.out.print("Max Print Size (XxYxZmm): ");
+                System.out.print("Max Print Size (XxYxZ mm): ");
                 String maxSize = scanner.nextLine();
                 
                 String id = equipmentService.add3DPrinter(name, rate, location, tech, maxSize);

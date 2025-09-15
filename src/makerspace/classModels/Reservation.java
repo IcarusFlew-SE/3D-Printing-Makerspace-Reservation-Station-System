@@ -31,7 +31,7 @@ public class Reservation {
        this.equipmentId = equipmentId;
        this.startTime = startTime;
        this.endTime = endTime;
-       this.status = "Pending"; 
+       this.status = "PENDING"; 
        this.createdAt = LocalDateTime.now();
     }
     
@@ -40,9 +40,9 @@ public class Reservation {
     	LocalDateTime now = LocalDateTime.now();
     	return now.isBefore(startTime) && ("Pending".equals(status) || "Approved".equals(status));
     }
-    public void cancel() { this.status = "cancelled"; }
-    public void approve() { this.status = "approved"; }
-    public void complete() { this.status = "completed"; }
+    public void cancel() { this.status = "CANCELLED"; }
+    public void approve() { this.status = "APPROVED"; }
+    public void complete() { this.status = "COMPLETED"; }
     
     public int getDuration()
     {
@@ -67,4 +67,5 @@ public class Reservation {
     			status,
     			cost);
     }
+	public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt;}
 }

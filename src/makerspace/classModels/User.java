@@ -14,6 +14,7 @@ public abstract class User {
 	public void setEmail(String email) { this.email = email; }
 	
     protected String password;
+    public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
     
     protected LocalDateTime registerDate;
@@ -32,9 +33,9 @@ public abstract class User {
     	this.registerDate = LocalDateTime.now();
     }
     
-    public boolean authentication(String inputPassword)
+    public boolean authentication(String password)
     {
-    	return this.password.equals(inputPassword);
+    	return this.password.equals(password);
     }
     
     @Override

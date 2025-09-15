@@ -23,13 +23,13 @@ public class Admin extends User {
 	private List<String> getDefaultPermissions(String level) {
 		List<String> perm = new ArrayList<>();
 		switch (level) {
-		case "Top Admin":
+		case "TOP":
 			perm.addAll(List.of("USER MANAGEMENT", "EQUIPMENT MANAGEMENT", "SYSTEM CONFIG", "REPORTS", "BILLING"));
 			break;
-		case "Manager":
+		case "MANAGER":
 			perm.addAll(List.of("EQUIPMENT MANAGEMENT", "REPORTS", "BILLING"));
 			break;
-		case "Assistant":
+		case "BASIC":
 			perm.addAll(List.of("USER MANAGEMENT", "BASIC REPORTS"));
 			break;
 		default:

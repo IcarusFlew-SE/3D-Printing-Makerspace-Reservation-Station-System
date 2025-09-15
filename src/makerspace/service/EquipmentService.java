@@ -7,6 +7,7 @@ import java.time.*;
 public class EquipmentService {
     private Map<String, Equipment> equipment;
     private DbService dbService;
+    private static final Random random = new Random();
     
     public EquipmentService() {
         this.equipment = new HashMap<>();
@@ -67,8 +68,14 @@ public class EquipmentService {
         return eq.isAvailable(); //used to check reservations (Simplified)
     }
     
+    private static final int ID_LENGTH = 6;
     private String generateEquipmentId() {
-        return "EQ_" + System.currentTimeMillis();
+    	StringBuilder sb = new StringBuilder(ID_LENGTH);
+    	for (int i = 0; i < ID_LENGTH; i++) {
+    		int digit = random.nextInt(10);
+    		sb.append(digit);
+    	}
+        return "EQ_" + sb.toString();
     }
     
     private void initializeDefaultEquipment() {

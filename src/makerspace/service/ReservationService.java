@@ -9,6 +9,7 @@ public class ReservationService {
     private EquipmentService equipmentService;
     private UserService userService;
     private DbService dbService;
+    private static final Random random = new Random();
     
     public ReservationService(EquipmentService equipmentService, UserService userService) {
         this.reservations = new HashMap<>();
@@ -71,7 +72,7 @@ public class ReservationService {
         return reservationId;
     }
     
-    public void cancelReservation(String reservationId, String userId) throws Exception 
+    public void cancelReservation(String reservationId, String userId) throws Exception
     {
         Reservation reservation = reservations.get(reservationId);
         if (reservation == null) {
@@ -81,7 +82,7 @@ public class ReservationService {
         if (!reservation.getClientId().equals(userId)) {
             throw new InvalidReservationException("You can only cancel your own reservations");
         }
-        
+       
         if (!reservation.canBeCancelled()) {
             throw new InvalidReservationException("Reservation cannot be cancelled");
         }
@@ -141,7 +142,7 @@ public class ReservationService {
             throw new InvalidReservationException("Equipment ID cannot be empty");
         }
         if (startTime == null || endTime == null) {
-            throw new InvalidReservationException("Start and end times cannot be null");
+            throw new InvalidReservationException("Start and end times cannot be empty");
         }
         if (startTime.isAfter(endTime)) {
             throw new InvalidReservationException("Start time must be before end time");
@@ -173,8 +174,15 @@ public class ReservationService {
         }
     }
     
+    private static final int ID_LENGTH = 6;
     private String generateReservationId() {
-        return "RES_" + System.currentTimeMillis();
+    	StringBuilder sb = new StringBuilder(ID_LENGTH);
+    	for (int i = 0; i < ID_LENGTH; i++) {
+    		int digit = random.nextInt(10);
+    		sb.append(digit);
+    	}
+        return "RES_" + sb.toString();
     }
 }
+
 

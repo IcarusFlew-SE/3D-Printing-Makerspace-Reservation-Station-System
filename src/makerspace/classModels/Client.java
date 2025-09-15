@@ -18,7 +18,7 @@ public class Client extends User {
 		super(userId, username, email, password);
 		this.accountBalance = 0.0;
 		this.reservationHistory = new ArrayList<>();
-		this.userLevel = "standard";
+		this.userLevel = "Standard";
 	}
 	
 	@Override
