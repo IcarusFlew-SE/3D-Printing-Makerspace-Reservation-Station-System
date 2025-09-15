@@ -56,12 +56,17 @@ public class ReservationService {
         // Process payment
         client.deductFromBalance(cost);
         
+        dbService.saveReservation(reservation);
+        
         // Save reservation
         reservations.put(reservationId, reservation);
         client.addReservation(reservation);
         
+        dbService.updateUser(client);
+        
         // Confirm reservation ~ approved
         reservation.approve();
+        
         
         // Update equipment status if reservation is immediate
         if (startTime.isBefore(LocalDateTime.now().plusMinutes(30))) 
@@ -94,6 +99,9 @@ public class ReservationService {
         
         // Cancel reservation
         reservation.cancel();
+        
+        dbService.updateReservation(reservation);
+        dbService.updateUser(client);
         
         // Free up equipment
         equipmentService.setEquipmentStatus(reservation.getEquipmentId(), "AVAILABLE");
@@ -129,8 +137,10 @@ public class ReservationService {
     public void completeReservation(String reservationId) throws Exception {
         Reservation reservation = getReservationById(reservationId);
         reservation.complete();
+        dbService.updateReservation(reservation);
         equipmentService.setEquipmentStatus(reservation.getEquipmentId(), "AVAILABLE");
     }
+    
     
     private void validateReservationInput(String clientId, String equipmentId,
                                         LocalDateTime startTime, LocalDateTime endTime) 

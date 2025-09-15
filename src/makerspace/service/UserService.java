@@ -116,8 +116,9 @@ public class UserService {
 			throw new UserException("Only Clients Have Account Balances");
 		} else {
 		Client client = (Client) user;
-		client.updateAccountBalance(amount);
 		dbService.updateUser(client);
+		client.updateAccountBalance(amount);
+		System.out.printf("New Balance: $%.2f%n", client.getAccountBalance());
 		}
 	}
     

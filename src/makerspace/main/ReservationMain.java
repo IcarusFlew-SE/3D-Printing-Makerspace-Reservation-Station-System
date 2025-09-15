@@ -362,11 +362,12 @@ public class ReservationMain {
             Client client = (Client) currentUser;
             client.updateAccountBalance(amount);
             
-            userService.updateUserEmail(client.getUserId(), client.getEmail()); // Save updated balance
+            userService.updateUserBalance(client.getUserId(), amount);
             
             System.out.printf("$%.2f added to your account. New balance: $%.2f\n", 
                              amount, 
                              client.getAccountBalance());
+            
         } catch (Exception e) {
             System.out.println("Error updating balance: " + e.getMessage());
         }
