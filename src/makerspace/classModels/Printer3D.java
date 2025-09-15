@@ -30,7 +30,7 @@ public class Printer3D extends Equipment{
 	
 	public boolean canPrintMaterial(String material)
 	{
-		return printMaterial != null && printMaterial.toLowerCase().contains(printMaterial.toLowerCase());
+		return printMaterial != null && printMaterial.toLowerCase().contains(material.toLowerCase());
 	}
 	
 	@Override

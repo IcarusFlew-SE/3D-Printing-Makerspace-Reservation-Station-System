@@ -12,7 +12,36 @@ public class EquipmentService {
     public EquipmentService() {
         this.equipment = new HashMap<>();
         this.dbService = new DbService();
-        initializeDefaultEquipment();
+        
+        // Try to load existing equipment from database first
+        Map<String, Equipment> loadedEquipment = dbService.loadEquipment();
+        this.equipment.putAll(loadedEquipment);
+        
+        // Only initialize default equipment if database is empty
+        if (this.equipment.isEmpty()) {
+            System.out.println("No equipment found in database. Initializing default equipment...");
+            initializeDefaultEquipment();
+        } else {
+            System.out.println("Loaded " + this.equipment.size() + " equipment items from database.");
+        }
+        
+        // Debug: Print all equipment status
+        debugEquipmentStatus();
+    }
+
+    // Add this debug method to help troubleshoot
+    public void debugEquipmentStatus() {
+        System.out.println("\n=== Equipment Debug Info ===");
+        System.out.println("Total equipment count: " + equipment.size());
+        for (Equipment eq : equipment.values()) {
+            System.out.printf("ID: %s | Name: %s | Type: %s | Status: %s | Available: %b%n", 
+                             eq.getEquipmentId(), 
+                             eq.getName(), 
+                             eq.getEquipmentType(),
+                             eq.getStatus(), 
+                             eq.isAvailable());
+        }
+        System.out.println("============================\n");
     }
     
     public String addEquipment(Equipment newEquipment) {
@@ -77,7 +106,7 @@ public class EquipmentService {
     	}
         return "EQ_" + sb.toString();
     }
-    
+   
     private void initializeDefaultEquipment() {
         // Initial default 3D Printers
         add3DPrinter("Prusa i3 MK3S+", 15.0, "Lab A", "FDM", "250x210x210mm"); //printer name, hourly rate, location, print tech, max print size

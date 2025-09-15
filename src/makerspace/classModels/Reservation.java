@@ -38,7 +38,7 @@ public class Reservation {
     public boolean canBeCancelled()
     {
     	LocalDateTime now = LocalDateTime.now();
-    	return now.isBefore(startTime) && ("Pending".equals(status) || "Approved".equals(status));
+    	return now.isBefore(startTime) && ("PENDING".equals(status) || "APPROVED".equals(status));
     }
     public void cancel() { this.status = "CANCELLED"; }
     public void approve() { this.status = "APPROVED"; }
@@ -52,7 +52,7 @@ public class Reservation {
     public boolean isActive() 
     {
         LocalDateTime now = LocalDateTime.now();
-        return now.isAfter(startTime) && now.isBefore(endTime) && "CONFIRMED".equals(status);
+        return now.isAfter(startTime) && now.isBefore(endTime) && "APPROVED".equals(status);
     }
     
     @Override

@@ -40,7 +40,7 @@ public class Equipment {
 		this.lastMaintenance = LocalDateTime.now();
 	}
 	
-	public boolean isAvailable() { return EquipmentStatusUtil.AVAILABLE.equals("Available"); }
+	public boolean isAvailable() { return EquipmentStatusUtil.AVAILABLE.equals(this.status); }
 	
 	public double calculateRate(int hours) { return hourCost * hours; }
 	

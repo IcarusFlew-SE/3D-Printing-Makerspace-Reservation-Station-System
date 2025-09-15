@@ -251,21 +251,6 @@ public class DbService {
 			tempFile.renameTo(inputFile);
 		}
 	}
-
-	private String equipmentToString(Equipment equipment) {
-        if (equipment instanceof Printer3D) {
-            Printer3D printer = (Printer3D) equipment;
-            return String.format("3D_PRINTER|%s|%s|%.2f|%s|%s|%s",
-                               printer.getEquipmentId(), printer.getName(),
-                               printer.getHourCost(), printer.getLocation(),
-                               printer.getPrintTech(), printer.getPrintVolume());
-        } else {
-            return String.format("EQUIPMENT|%s|%s|%s|%.2f|%s",
-                               equipment.getEquipmentId(), equipment.getName(),
-                               equipment.getEquipmentType(), equipment.getHourCost(),
-                               equipment.getLocation());
-        }
-	}
 	
 	public void saveEquipment(Equipment equipment) {
         try (PrintWriter writer = new PrintWriter(new FileWriter(EQUIPMENT_FILE, true))) {
@@ -279,6 +264,90 @@ public class DbService {
         //append the updated equipment to file
         saveEquipment(equipment);
     }
+    
+    public Map<String, Equipment> loadAllEquipment() {
+		return loadEquipment();
+	}
 	
+	
+    public Map<String, Equipment> loadEquipment() {
+        Map<String, Equipment> equipmentMap = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(EQUIPMENT_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                Equipment equipment = stringToEquipment(line);
+                if (equipment != null) {
+                    equipmentMap.put(equipment.getEquipmentId(), equipment);
+                }
+            }
+        } catch (FileNotFoundException e) {
+            // File doesn't exist yet, return empty map
+            System.out.println("Equipment file not found. Starting with empty equipment list.");
+        } catch (IOException e) {
+            System.err.println("Error loading equipment: " + e.getMessage());
+        }
+        return equipmentMap;
+    }
+
+    private Equipment stringToEquipment(String line) {
+        String[] parts = line.split("\\|");
+        if (parts.length < 5) {
+            System.err.println("Invalid equipment line format: " + line);
+            return null;
+        }
+        
+        try {
+            String type = parts[0];
+            String id = parts[1];
+            String name = parts[2];
+            
+            if ("3D_PRINTER".equals(type) && parts.length >= 6) {
+            	
+                // Format: 3D_PRINTER|id|name|hourCost|location|printTech|printVolume
+                double hourCost = Double.parseDouble(parts[3]);
+                String location = parts[4];
+                String printTech = parts[5];
+                String printVolume = parts.length > 6 ? parts[6] : "Unknown";
+                
+                return new Printer3D(id, name, hourCost, location, printTech, printVolume);
+                
+            } else if ("EQUIPMENT".equals(type) && parts.length >= 5) {
+            	
+                // Format: EQUIPMENT|id|name|equipmentType|hourCost|location
+                String equipmentType = parts[3];
+                double hourCost = Double.parseDouble(parts[4]);
+                String location = parts[5];
+                
+                return new Equipment(id, name, equipmentType, hourCost, location);
+            }
+            
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing equipment cost: " + line);
+        } catch (Exception e) {
+            System.err.println("Error parsing equipment line: " + line + " - " + e.getMessage());
+        }
+        
+        return null;
+    }
+
+    private String equipmentToString(Equipment equipment) {
+        if (equipment instanceof Printer3D) {
+            Printer3D printer = (Printer3D) equipment;
+            return String.format("3D_PRINTER|%s|%s|%.2f|%s|%s|%s",
+                               printer.getEquipmentId(), 
+                               printer.getName(),
+                               printer.getHourCost(), 
+                               printer.getLocation(),
+                               printer.getPrintTech(), 
+                               printer.getPrintVolume());
+        } else {
+            return String.format("EQUIPMENT|%s|%s|%s|%.2f|%s",
+                               equipment.getEquipmentId(), 
+                               equipment.getName(),
+                               equipment.getEquipmentType(), 
+                               equipment.getHourCost(),
+                               equipment.getLocation());
+        }
+    }
 }
 
